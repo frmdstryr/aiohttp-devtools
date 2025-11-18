@@ -222,7 +222,11 @@ async def src_reload(app: web.Application, path: Optional[str] = None) -> int:
 
     is_html = None
     if path:
-        path = str(Path(app[STATIC_URL]) / Path(path).relative_to(app[STATIC_PATH]))
+        try:
+            path = str(Path(app[STATIC_URL]) / Path(path).relative_to(app[STATIC_PATH]))
+        except ValueError as e:
+            aux_logger.warning('error resolving relative path: %s', e)
+            return 0
         is_html = mimetypes.guess_type(path)[0] == 'text/html'
 
     reloads = 0
