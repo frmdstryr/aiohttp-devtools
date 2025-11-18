@@ -84,6 +84,18 @@ async def test_aux_reload_html_different():
     assert ws.send_str.call_count == 0
 
 
+async def test_aux_reload_no_static_path():
+    aux_app = Application()
+    ws = MagicMock()
+    ws.send_str = MagicMock(return_value=create_future())
+    aux_app[LAST_RELOAD] = [0, 0.]
+    aux_app[STATIC_PATH] = "."
+    aux_app[STATIC_URL] = "/static/"
+    aux_app[WS] = set(((ws, "/foo/bar"),))  # type: ignore[misc]
+    assert 0 == await src_reload(aux_app, '/path/to/static_files/foo/.bar.html.kate-swp')
+    assert ws.send_str.call_count == 0
+
+
 async def test_aux_reload_runtime_error(smart_caplog):
     aux_app = Application()
     ws = MagicMock()
